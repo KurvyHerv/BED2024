@@ -1,6 +1,6 @@
 const path = require('node:path');
 const fs = require('node:fs')
-const note = '/BED/BED2024/note.txt';
+const note = '/week1/prac1/note.txt';
 const content = 'hello world'
 const chalk = require('chalk');
 
