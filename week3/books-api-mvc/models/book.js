@@ -32,30 +32,34 @@ const books = [
     }
   
     static async updateBook(id, newBookData) {
-      const books = await this.getAllBooks();
-      const existingBookIndex = books.findIndex((book) => book.id === id);
-      if (existingBookIndex === -1) {
-        return null;
-      }
+      const connection = await sql.connect(dbConfig);
   
-      const updatedBook = {
-        ...books[existingBookIndex],
-        ...newBookData,
-      };
+      const sqlQuery = `UPDATE Books SET title = @title, author = @author WHERE id = @id`; // Parameterized query
   
-      books[existingBookIndex] = updatedBook;
-      return updatedBook;
+      const request = connection.request();
+      request.input("id", id);
+      request.input("title", newBookData.title || null); // Handle optional fields
+      request.input("author", newBookData.author || null);
+  
+      await request.query(sqlQuery);
+  
+      connection.close();
+  
+      return this.getBookById(id); // returning the updated book data
     }
   
     static async deleteBook(id) {
-      const books = await this.getAllBooks();
-      const bookIndex = books.findIndex((book) => book.id === id);
-      if (bookIndex === -1) {
-        return false;
-      }
+      const connection = await sql.connect(dbConfig);
   
-      books.splice(bookIndex, 1);
-      return true;
+      const sqlQuery = `DELETE FROM Books WHERE id = @id`; // Parameterized query
+  
+      const request = connection.request();
+      request.input("id", id);
+      const result = await request.query(sqlQuery);
+  
+      connection.close();
+  
+      return result.rowsAffected > 0; // Indicate success based on affected rows
     }
   }
   
